@@ -26,6 +26,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name="org.eclipse.paho.android.service.MqttService"></service>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAbqNmFwpx--0FuIcW_IlamzuOAqKIwOYM" />

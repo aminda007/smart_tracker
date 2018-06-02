@@ -10,21 +10,18 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -37,7 +34,10 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
+
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     private LocationManager locationManager;
     private LocationManager mLocationManager;
     private MapFragment mapFragment;
+    private MqttClientMy client;
 
     private static final String TAG = "MainActivity";
 
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -92,7 +94,27 @@ public class MainActivity extends AppCompatActivity
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         checkLocation();
+        MqttCallback callback = new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable throwable) {
+                Log.w("Mqtt", "connectionLost111111111111111111111111111111111111");
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                Log.d("Mqtt", mqttMessage.toString());
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+                Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
+            }
+        };
+        client = new MqttClientMy(this.getApplicationContext(),"testClient",callback);
+
+
     }
+
 
     @Override
     public void onBackPressed() {
@@ -146,7 +168,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
-
+            client.subscribeToTopic("test123");
         }
 
         if(fragment != null){
@@ -190,6 +212,10 @@ public class MainActivity extends AppCompatActivity
     public void onLocationChanged(Location location) {
 //        Toast.makeText(this, "msg", Toast.LENGTH_SHORT).show();
         GMapFragment.updateLocation(location, "user");
+        if(client.isConnected()){
+            client.publishToTopic("location","location data");
+        }
+
     }
 
     private boolean checkLocation() {
