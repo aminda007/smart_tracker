@@ -3,35 +3,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_bus"
-            android:icon="@drawable/ic_directions_bus"
-            android:title="Bus" />
-        <item
-            android:id="@+id/nav_train"
-            android:icon="@drawable/ic_train"
-            android:title="Train" />
-        <item
-            android:id="@+id/nav_staff"
-            android:icon="@drawable/ic_staff"
-            android:title="Staff Service" />
-        <item
-            android:id="@+id/nav_school"
-            android:icon="@drawable/ic_school"
-            android:title="School Service" />
-    </group>
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
 
-    <item android:title="Contact Us">
+    <item android:title="Locate">
         <menu>
             <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_mail_black_24dp"
-                android:title="Mail" />
+                android:id="@+id/nav_bus"
+                android:icon="@drawable/ic_directions_bus"
+                android:title="Bus" />
             <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_call"
-                android:title="Call" />
+                android:id="@+id/nav_train"
+                android:icon="@drawable/ic_train"
+                android:title="Train" />
+            <item
+                android:id="@+id/nav_staff"
+                android:icon="@drawable/ic_staff"
+                android:title="Staff Service" />
+            <item
+                android:id="@+id/nav_school"
+                android:icon="@drawable/ic_school"
+                android:title="School Service" />
+        </menu>
+    </item>
+
+    <item android:title="Driver">
+        <menu>
+            <item
+                android:id="@+id/nav_start"
+                android:icon="@drawable/ic_play"
+                android:title="Start" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_person_outline_black_24dp"
+                android:title="Log In" />
         </menu>
     </item>
 

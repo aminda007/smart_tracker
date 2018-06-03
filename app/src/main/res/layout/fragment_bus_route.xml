@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".Fragments.BusFragment"
-    android:orientation="vertical">
+    tools:context=".Fragments.BusRouteFragment">
+
+    <!-- TODO: Update blank fragment layout -->
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
@@ -13,11 +14,10 @@
         app:cardBackgroundColor="@color/cardview_light_background">
 
         <ListView
-            android:id="@+id/busList"
+            android:id="@+id/busRouteList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>ListView
+            android:layout_height="match_parent" />
 
     </android.support.v7.widget.CardView>
 
-
-</LinearLayout>
+</FrameLayout>

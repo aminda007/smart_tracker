@@ -9,4 +9,15 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="IP_ADDRESS">http://167.99.195.237/bus_tracker_server/web/app_dev.php/</string>
+    <string name="AUTHENTICATE">driver/api/login</string>
+    <string name="BUS_ROUTES">api/route/list</string>
+    <string name="BUS_LIST">api/bus/list</string>
+    <string name="TRAIN_LIST">api/train/list</string>
+    <string name="CORDINATE_LIST">api/coordinate/list</string>
+    <string name="CHANGE_PASSWORD">driver/api/changePassword</string>
+    <string name="NO_INTERNET">No Internet Connection</string>
+    <string name="user_details">userinfo</string>
+    <string name="USER_USERNAME">username</string>
+    <string name="notLogged">notLogged</string>
 </resources>

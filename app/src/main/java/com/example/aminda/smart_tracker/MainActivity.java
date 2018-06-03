@@ -3,6 +3,7 @@ package com.example.aminda.smart_tracker;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -26,18 +27,24 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.aminda.smart_tracker.Fragments.BusFragment;
+import com.example.aminda.smart_tracker.FetchData.BusRoutes;
+import com.example.aminda.smart_tracker.Fragments.BusRouteFragment;
 import com.example.aminda.smart_tracker.Fragments.GMapFragment;
-import com.example.aminda.smart_tracker.Fragments.TrainFragment;
+import com.example.aminda.smart_tracker.Fragments.Login;
+import com.example.aminda.smart_tracker.Fragments.TrainLineFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
@@ -53,6 +60,19 @@ public class MainActivity extends AppCompatActivity
     private LocationManager mLocationManager;
     private MapFragment mapFragment;
     private MqttClientMy client;
+    private MqttClientMy driver;
+    private Fragment fragment = null;
+    private BusRouteFragment busRouteFragment = null;
+    private boolean inHome = false;
+    private boolean active = false;
+    private boolean started = false;
+    private String username;
+    private String client_name = "yyyyy";
+    private JSONArray busRoutesArray;
+    private JSONArray busArray;
+    private String selectedBusRoute;
+    private String selectedDriver;
+    private int selectedDriverIndex;
 
     private static final String TAG = "MainActivity";
 
@@ -83,6 +103,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         fm = getSupportFragmentManager();
         showMapFragment();
+        setInHome(true);
 
         GMapFragment.setActivity(this);
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -94,27 +115,24 @@ public class MainActivity extends AppCompatActivity
         mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         checkLocation();
-        MqttCallback callback = new MqttCallback() {
-            @Override
-            public void connectionLost(Throwable throwable) {
-                Log.w("Mqtt", "connectionLost111111111111111111111111111111111111");
-            }
 
-            @Override
-            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-                Log.d("Mqtt", mqttMessage.toString());
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
-                Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
-            }
-        };
-        client = new MqttClientMy(this.getApplicationContext(),"testClient",callback);
+        startClient();
 
 
+        SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
+        if(!sharedpreferences.getString(String.valueOf(R.string.USER_USERNAME),String.valueOf(R.string.notLogged)).equals(String.valueOf(R.string.notLogged))){
+            setActive(true);
+            Log.d(TAG, "user logeed in");
+        }else{
+            Log.d(TAG, "user not logeed in");
+        }
     }
 
+    @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+    }
 
     @Override
     public void onBackPressed() {
@@ -153,36 +171,147 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         hideMapFragment();
-
+//        setInHome(false);
         int id = item.getItemId();
-        Fragment fragment = null;
 
-        if (id == R.id.nav_bus) {
-            fragment = new BusFragment();
+        if (id == R.id.nav_home) {
+            showMapFragment();
+            setInHome(true);
+        }else if (id == R.id.nav_bus) {
+            setInHome(false);
+            BusRoutes br = new BusRoutes(this);
+            br.execute("a");
+
         } else if (id == R.id.nav_train) {
-            fragment = new TrainFragment();
+            setInHome(false);
+            fragment = new TrainLineFragment();
+            showFragment(fragment);
         } else if (id == R.id.nav_staff) {
-
+            setInHome(false);
         } else if (id == R.id.nav_school) {
+            setInHome(false);
+        } else if (id == R.id.nav_start) {
+            if(isActive()){
+                if(isStarted()){
+                    Toast.makeText(this, "Journey Stopped!", Toast.LENGTH_SHORT).show();
+                    setStarted(false);
+                    item.setTitle("Start");
+                    item.setIcon(R.drawable.ic_play);
+                }else{
+                    Toast.makeText(this, "Journey Started!", Toast.LENGTH_SHORT).show();
+                    setStarted(true);
+                    item.setTitle("Stop");
+                    item.setIcon(R.drawable.ic_pause);
+                }
+            }else{
+                Toast.makeText(this, "Login required to start journey!", Toast.LENGTH_SHORT).show();
+            }
 
-        } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
-            client.subscribeToTopic("test123");
+        } else if (id == R.id.nav_logout) {
+
+            if(!active){
+                Login login = new Login();
+                login.setMain(this);
+                showFragment(login);
+                item.setTitle("Log Out");
+            }else{
+                LogOut();
+                item.setTitle("Log In");
+            }
+
         }
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+
+        return true;
+    }
+
+    private void LogOut() {
+        setActive(false);
+        setStarted(false);
+        setUsername("");
+    }
+
+
+
+    public void startClient(){
+        MqttCallback callback = new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable throwable) {
+                Log.w("Mqtt", "connectionLost111111111111111111111111111111111111");
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                String msg = mqttMessage.toString();
+                String[] msgSplitted = msg.split(",");
+                Log.d("Mqtt------------------", msgSplitted[0]+"   "+msgSplitted[1]);
+                Log.d(TAG, "is in home"+isInHome());
+                if(!isInHome()){
+                    LatLng latLng = new LatLng(Double.parseDouble(msgSplitted[0]), Double.parseDouble(msgSplitted[1]));
+                    GMapFragment.updateDriverLocation(latLng);
+                }
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+                Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
+            }
+        };
+
+        client = new MqttClientMy(this.getApplicationContext(), getClient_name() +"_device",callback);
+    }
+
+    public void startDriverClient(){
+        MqttCallback callback = new MqttCallback() {
+            @Override
+            public void connectionLost(Throwable throwable) {
+                Log.w("Mqtt", "connectionLost111111111111111111111111111111111111");
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
+                String msg = mqttMessage.toString();
+                String[] msgSplitted = msg.split(",");
+                Log.d("driver--------------", msgSplitted[0]+"   "+msgSplitted[1]);
+                if(!isInHome()){
+                    LatLng latLng = new LatLng(Double.parseDouble(msgSplitted[0]), Double.parseDouble(msgSplitted[1]));
+                    GMapFragment.updateDriverLocation(latLng);
+                }
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+                Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
+            }
+        };
+
+        driver = new MqttClientMy(this.getApplicationContext(), getUsername() +"_device",callback);
+    }
+
+    public void subscribeToDriver(){
+        client.subscribeToTopic(getSelectedDriver()+"/PUB");
+        JSONObject driver = null;
+        try {
+            driver = (JSONObject) busArray.get(getSelectedDriverIndex());
+            GMapFragment.updateDriverInfo((String)driver.get("busNo")+(String)driver.get("telNo")+(String)driver.get("ownerType")+(String)driver.get("busType"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showFragment(Fragment fragment){
         if(fragment != null){
             FragmentTransaction ft = fm.beginTransaction();
             ft.replace(R.id.screen_area, fragment);
             ft.commit();
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     public void showMapFragment(){
+
         FragmentTransaction ft = fm.beginTransaction();
         if(fm.findFragmentByTag("mapFragment") == null){
             ft.add(R.id.screen_area, new GMapFragment(), "homeFragment");
@@ -211,11 +340,17 @@ public class MainActivity extends AppCompatActivity
 
     public void onLocationChanged(Location location) {
 //        Toast.makeText(this, "msg", Toast.LENGTH_SHORT).show();
-        GMapFragment.updateLocation(location, "user");
-        if(client.isConnected()){
-            client.publishToTopic("location","location data");
+        if(isInHome()){
+            GMapFragment.updateLocation(location);
+        }else{
+            GMapFragment.updateUserLocation(location);
         }
-
+        if(driver != null){
+            if(driver.isConnected() && isActive() && isStarted()){
+                Log.d(TAG,"topic is "+ getUsername() +"/PUB");
+                driver.publishToTopic(getUsername() +"/PUB",location.getLatitude()+","+location.getLongitude());
+            }
+        }
     }
 
     private boolean checkLocation() {
@@ -278,7 +413,12 @@ public class MainActivity extends AppCompatActivity
             startLocationUpdates();
         }
         if (mLocation != null) {
-            GMapFragment.updateLocation(mLocation, "user");
+            if(isInHome()){
+                GMapFragment.updateLocation(mLocation);
+            }else{
+                GMapFragment.updateUserLocation(mLocation);
+            }
+
 
         } else {
             Toast.makeText(this, "Location not Detected", Toast.LENGTH_SHORT).show();
@@ -339,4 +479,89 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    public boolean isInHome() {
+        return inHome;
+    }
+
+    public void setInHome(boolean inHome) {
+        this.inHome = inHome;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public JSONArray getBusRoutesArray() {
+        return busRoutesArray;
+    }
+
+    public void setBusRoutesArray(JSONArray busRoutesArray) {
+        this.busRoutesArray = busRoutesArray;
+    }
+
+    public JSONArray getBusArray() {
+        return busArray;
+    }
+
+    public void setBusArray(JSONArray busArray) {
+        this.busArray = busArray;
+    }
+
+    public String getSelectedBusRoute() {
+        return selectedBusRoute;
+    }
+
+    public void setSelectedBusRoute(String selectedBusRoute) {
+        this.selectedBusRoute = selectedBusRoute;
+    }
+
+    public String getSelectedDriver() {
+        return selectedDriver;
+    }
+
+    public void setSelectedDriver(String selectedDriver) {
+        this.selectedDriver = selectedDriver;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public int getSelectedDriverIndex() {
+        return selectedDriverIndex;
+    }
+
+    public void setSelectedDriverIndex(int selectedDriverIndex) {
+        this.selectedDriverIndex = selectedDriverIndex;
+    }
+
+    public void saveUser(String username) {
+        SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.putString(String.valueOf(R.string.USER_USERNAME), username);
+    }
+
+    public String getClient_name() {
+        return client_name;
+    }
+
+    public void setClient_name(String client_name) {
+        this.client_name = client_name;
+    }
 }

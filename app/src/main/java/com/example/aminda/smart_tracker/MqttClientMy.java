@@ -29,7 +29,7 @@ public class MqttClientMy {
         client = new MqttAndroidClient(context, "tcp://167.99.195.237:1883", clientId);
         client.setCallback(callback);
         MqttConnectOptions options = new MqttConnectOptions();
-        options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1);
+        options.setMqttVersion(MqttConnectOptions.MQTT_VERSION_3_1_1);
         try {
             IMqttToken token = client.connect(options);
             token.setActionCallback(new IMqttActionListener() {
