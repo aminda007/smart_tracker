@@ -1,7 +1,48 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.GMapFragment" >
+
+    <!-- TODO: Update blank fragment layout -->
+
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mapFragment"
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Fragments.GMapFragment" />
+    />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/find_busBtn"
+            android:layout_width="47dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/find_userBtn"
+            android:layout_marginTop="0dp"
+            android:background="@drawable/ic_find_back"
+            android:drawableLeft="@drawable/ic_find_bus"
+            android:paddingLeft="8dp"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu" />
+
+        <Button
+            android:id="@+id/find_userBtn"
+            android:layout_width="47dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="171dp"
+            android:background="@drawable/ic_find_back"
+            android:drawableLeft="@drawable/ic_find_user"
+            android:paddingLeft="8dp"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.PopupMenu" />
+    </RelativeLayout>
+
+
+</FrameLayout>

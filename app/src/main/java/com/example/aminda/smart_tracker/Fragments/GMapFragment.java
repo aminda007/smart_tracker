@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.aminda.smart_tracker.MainActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +35,8 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
     private static Marker marker;
     private static Marker driver_marker;
     private static String driverInfo;
+    private static Button findUserBtn;
+    private static Button findDriverBtn;
 
 
 
@@ -43,6 +46,14 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
 
     public static void setActivity(MainActivity Activity) {
         activity = Activity;
+    }
+
+    public static String getDriverInfo() {
+        return driverInfo;
+    }
+
+    public static void setDriverInfo(String driverInfo) {
+        GMapFragment.driverInfo = driverInfo;
     }
 
 
@@ -55,6 +66,21 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
                 .findFragmentById(R.id.mapFragment);
         mapFragment.getMapAsync(this);
+        findUserBtn  = (Button) view.findViewById(R.id.find_userBtn);
+        findDriverBtn  = (Button) view.findViewById(R.id.find_busBtn);
+        findUserBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                focusUser();
+            }
+        });
+        findDriverBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                focusDriver();
+            }
+        });
+        hideIcons();
         return  view;
 
     }
@@ -73,7 +99,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         Log.d("ssssssssssssssssssssss","ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
         marker = null;
         driver_marker = null;
-        driverInfo = null;
+        setDriverInfo(null);
         LatLng sri_lanka = new LatLng(7.241829, 80.7556483);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sri_lanka));
     }
@@ -99,7 +125,6 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
     public static void updateUserLocation(Location location){
         LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
         float zoomLevel = 10.0f;
-
         if (marker == null) {
             marker = gmap.addMarker(new MarkerOptions()
                     .position(loc)
@@ -109,30 +134,44 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         } else {
             marker.setPosition(loc);
         }
-//        zoomLevel = 15.0f;//This goes up to 21
-
-//        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc,zoomLevel));
     }
 
     public static void updateDriverLocation(LatLng loc){
-        float zoomLevel = 10.0f;
-
         if (driver_marker == null) {
             driver_marker = gmap.addMarker(new MarkerOptions()
                     .position(loc)
-                    .title("You are Here!")
+                    .title(getDriverInfo())
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_bus_blue_round)));
 //            marker.showInfoWindow();
         } else {
             driver_marker.setPosition(loc);
         }
-//        zoomLevel = 15.0f;//This goes up to 21
-
-//        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc,zoomLevel));
     }
 
     public static void updateDriverInfo(String info){
-        driverInfo = info;
+        setDriverInfo(info);
     }
 
+    public static void focusUser(){
+        LatLng loc = marker.getPosition();
+        float zoomLevel = 15.0f;//This goes up to 21
+        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc,zoomLevel));
+    }
+
+    public static void focusDriver(){
+        LatLng loc = driver_marker.getPosition();
+        float zoomLevel = 15.0f;//This goes up to 21
+        gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc,zoomLevel));
+    }
+
+
+    public static void showIcons(){
+        findUserBtn.setVisibility(View.VISIBLE);
+        findDriverBtn.setVisibility(View.VISIBLE);
+    }
+
+    public static void hideIcons(){
+        findUserBtn.setVisibility(View.INVISIBLE);
+        findDriverBtn.setVisibility(View.INVISIBLE);
+    }
 }
