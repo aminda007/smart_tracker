@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     private String busTimeLow;
     private NavigationView navigationView;
     private String driverInfo;
+    private JSONArray coordinateArray;
 
     private static final String TAG = "MainActivity";
 
