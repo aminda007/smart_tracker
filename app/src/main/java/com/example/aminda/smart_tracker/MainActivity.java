@@ -46,6 +46,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
 
@@ -261,7 +263,7 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
-        client = new MqttClientMy(this.getApplicationContext(), getClient_name() +"_device",callback);
+        client = new MqttClientMy(this.getApplicationContext(), "device_" + getClient_name() ,callback);
     }
 
     public void startDriverClient(){
@@ -555,13 +557,13 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString(String.valueOf(R.string.USER_USERNAME), username);
+        editor.commit();
     }
 
     public String getClient_name() {
-        return client_name;
+        Random r = new Random();
+        int i = r.nextInt(10000000);
+        return String.valueOf(i);
     }
 
-    public void setClient_name(String client_name) {
-        this.client_name = client_name;
-    }
 }
