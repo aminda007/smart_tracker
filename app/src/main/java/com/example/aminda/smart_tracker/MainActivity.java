@@ -31,6 +31,8 @@ import com.example.aminda.smart_tracker.FetchData.BusRoutes;
 import com.example.aminda.smart_tracker.Fragments.BusRouteFragment;
 import com.example.aminda.smart_tracker.Fragments.GMapFragment;
 import com.example.aminda.smart_tracker.Fragments.Login;
+import com.example.aminda.smart_tracker.Fragments.SchoolFragment;
+import com.example.aminda.smart_tracker.Fragments.StaffFragment;
 import com.example.aminda.smart_tracker.Fragments.TrainLineFragment;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -75,6 +77,8 @@ public class MainActivity extends AppCompatActivity
     private String selectedBusRoute;
     private String selectedDriver;
     private int selectedDriverIndex;
+    private String busTimeHigh;
+    private String busTimeLow;
 
     private static final String TAG = "MainActivity";
 
@@ -123,6 +127,7 @@ public class MainActivity extends AppCompatActivity
 
         SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
         if(!sharedpreferences.getString(String.valueOf(R.string.USER_USERNAME),String.valueOf(R.string.notLogged)).equals(String.valueOf(R.string.notLogged))){
+            username  = sharedpreferences.getString(String.valueOf(R.string.USER_USERNAME),String.valueOf(R.string.notLogged));
             setActive(true);
             Log.d(TAG, "user logeed in");
         }else{
@@ -173,6 +178,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         hideMapFragment();
+        GMapFragment.hideIcons();
 //        setInHome(false);
         int id = item.getItemId();
 
@@ -189,9 +195,11 @@ public class MainActivity extends AppCompatActivity
             fragment = new TrainLineFragment();
             showFragment(fragment);
         } else if (id == R.id.nav_staff) {
-            setInHome(false);
+            fragment = new StaffFragment();
+            showFragment(fragment);
         } else if (id == R.id.nav_school) {
-            setInHome(false);
+            fragment = new SchoolFragment();
+            showFragment(fragment);
         } else if (id == R.id.nav_start) {
             if(isActive()){
                 if(isStarted()){
@@ -420,8 +428,6 @@ public class MainActivity extends AppCompatActivity
             }else{
                 GMapFragment.updateUserLocation(mLocation);
             }
-
-
         } else {
             Toast.makeText(this, "Location not Detected", Toast.LENGTH_SHORT).show();
         }
@@ -566,4 +572,28 @@ public class MainActivity extends AppCompatActivity
         return String.valueOf(i);
     }
 
+    public void showFindIcons() {
+        GMapFragment.showIcons();
+    }
+
+    public void hideFindIcons() {
+        GMapFragment.hideIcons();
+    }
+
+
+    public void setBusTimeHigh(String s) {
+        this.busTimeHigh = s;
+    }
+
+    public void setBusTimeLow(String s) {
+        this.busTimeLow = s;
+    }
+
+    public String getBusTimeHigh() {
+        return busTimeHigh;
+    }
+
+    public String getBusTimeLow() {
+        return busTimeLow;
+    }
 }

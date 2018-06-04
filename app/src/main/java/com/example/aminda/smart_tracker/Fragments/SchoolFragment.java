@@ -6,54 +6,33 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-import com.example.aminda.smart_tracker.MainActivity;
 import com.example.aminda.smart_tracker.R;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TrainLineFragment extends Fragment {
+public class SchoolFragment extends Fragment {
 
-    private MainActivity main;
 
-    public TrainLineFragment() {
+    public SchoolFragment() {
         // Required empty public constructor
     }
-
-
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_train_line, container, false);
-
+        View view =  inflater.inflate(R.layout.fragment_school, container, false);
         String[] routes = {"Colombo to Badulla", "Peradeniya Junction to Matale", "Ragama to Noor Nagar", "Kelani Valley Railway Line", "Northern Line", "Mannar Line", "Trincomalee Line", "Batticaloa Line", "Coastal Line"};
         ListAdapter adapter = new ArrayAdapter<String>(this.getContext(), android.R.layout.simple_list_item_1, routes);
-        ListView routeList = (ListView)view.findViewById(R.id.trainLineList);
+        ListView routeList = (ListView)view.findViewById(R.id.schoolList);
         routeList.setAdapter(adapter);
-
-        routeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-            }
-        });
-
-        return view;
+        return  view;
     }
 
-    public MainActivity getMain() {
-        return main;
-    }
-
-    public void setMain(MainActivity main) {
-        this.main = main;
-    }
 }

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.aminda.smart_tracker.Adapters.BusAdapter;
 import com.example.aminda.smart_tracker.MainActivity;
@@ -21,6 +22,7 @@ import org.json.JSONObject;
 public class BusFragment extends Fragment {
 
     private MainActivity main;
+    private static final String TAG = "BusFragment";
 
     public BusFragment() {
         // Required empty public constructor
@@ -58,9 +60,14 @@ public class BusFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.d("5555555555555555555555", String.valueOf(adapterView.getItemAtPosition(i)));
-                main.setSelectedDriver(String.valueOf(adapterView.getItemAtPosition(i)));
-                main.setSelectedDriverIndex(i);
-                showBus();
+                if(checkActive(i)){
+                    main.setSelectedDriver(String.valueOf(adapterView.getItemAtPosition(i)));
+                    main.setSelectedDriverIndex(i);
+                    showBus();
+                }else{
+                    Toast.makeText(main, "Journey Stopped!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         return view;
@@ -69,6 +76,20 @@ public class BusFragment extends Fragment {
     private void showBus() {
         main.subscribeToDriver();
         main.showMapFragment();
+        main.showFindIcons();
+    }
+
+    private boolean checkActive(int i){
+        boolean connected = false;
+        try {
+            JSONArray a = main.getBusArray();
+            JSONObject o = (JSONObject) a.get(i);
+            connected = o.getBoolean("connected");
+            Log.d(TAG, "jjjjjjjjjjjjjjjjjjjjjjjj"+connected);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return connected;
     }
 
     public MainActivity getMain() {

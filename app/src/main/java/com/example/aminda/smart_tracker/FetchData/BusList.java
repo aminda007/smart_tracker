@@ -43,7 +43,12 @@ public class BusList extends AsyncTask<String,Void,String []> {
     protected String[] doInBackground(String... params) {
 
         try {
+//            String route_id = params[0];
+//            String lowTime = params[1];
+//            String highTime = params[2];
             String route_id = params[0];
+            String lowTime = params[1];
+            String highTime = params[2];
 //            String password = params[1];
 
             URL url = new URL(main.getApplicationContext().getResources().getString(R.string.IP_ADDRESS )+ main.getApplicationContext().getResources().getString(R.string.BUS_LIST));
@@ -53,7 +58,9 @@ public class BusList extends AsyncTask<String,Void,String []> {
             httpURLConnection.setDoInput(true);
             OutputStream outputStream = httpURLConnection.getOutputStream();
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-            String post_data= URLEncoder.encode("route_id","UTF-8")+"="+URLEncoder.encode(route_id,"UTF-8") ;
+            String post_data= URLEncoder.encode("route_id","UTF-8")+"="+URLEncoder.encode(route_id,"UTF-8")+"&"+
+                    URLEncoder.encode("lowTime","UTF-8")+"="+URLEncoder.encode(lowTime,"UTF-8")+"&"+
+                    URLEncoder.encode("highTime","UTF-8")+"="+URLEncoder.encode(highTime,"UTF-8");
             bufferedWriter.write(post_data);
             bufferedWriter.flush();
             bufferedWriter.close();
@@ -109,7 +116,7 @@ public class BusList extends AsyncTask<String,Void,String []> {
                 String routeNo  = (String) jo.get("busNo");
                 String name = (String) jo.get("busType");
 //                int id = (int) jo.get("id");
-                Log.d("aaaaaaaaaa",routeNo+name);
+                Log.d("bbbbbbbbbbb",routeNo+name);
             }
         } catch (JSONException e) {
             e.printStackTrace();
