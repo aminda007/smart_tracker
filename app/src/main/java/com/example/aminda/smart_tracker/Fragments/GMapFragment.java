@@ -34,7 +34,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
     private static GoogleMap gmap;
     private static Marker marker;
     private static Marker driver_marker;
-    private static String driverInfo;
+    private static String driverInfo = "Not Available";
     private static Button findUserBtn;
     private static Button findDriverBtn;
 
@@ -46,14 +46,6 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
 
     public static void setActivity(MainActivity Activity) {
         activity = Activity;
-    }
-
-    public static String getDriverInfo() {
-        return driverInfo;
-    }
-
-    public static void setDriverInfo(String driverInfo) {
-        GMapFragment.driverInfo = driverInfo;
     }
 
 
@@ -71,16 +63,22 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         findUserBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                focusUser();
+                if(marker != null){
+                    focusUser();
+                }
             }
         });
         findDriverBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                focusDriver();
+                if(driver_marker != null) {
+                    focusDriver();
+                }
             }
         });
-        hideIcons();
+        if(activity.isInHome()){
+            hideIcons();
+        }
         return  view;
 
     }
@@ -99,7 +97,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         Log.d("ssssssssssssssssssssss","ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss");
         marker = null;
         driver_marker = null;
-        setDriverInfo(null);
+//        setDriverInfo(null);
         LatLng sri_lanka = new LatLng(7.241829, 80.7556483);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sri_lanka));
     }
@@ -140,7 +138,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         if (driver_marker == null) {
             driver_marker = gmap.addMarker(new MarkerOptions()
                     .position(loc)
-                    .title(getDriverInfo())
+                    .title(activity.getDriverInfo())
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_bus_blue_round)));
 //            marker.showInfoWindow();
         } else {
@@ -148,9 +146,6 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public static void updateDriverInfo(String info){
-        setDriverInfo(info);
-    }
 
     public static void focusUser(){
         LatLng loc = marker.getPosition();
@@ -164,11 +159,11 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         gmap.moveCamera(CameraUpdateFactory.newLatLngZoom(loc,zoomLevel));
     }
 
-
-    public static void showIcons(){
-        findUserBtn.setVisibility(View.VISIBLE);
-        findDriverBtn.setVisibility(View.VISIBLE);
-    }
+//
+//    public static void showIcons(){
+//        findUserBtn.setVisibility(View.VISIBLE);
+//        findDriverBtn.setVisibility(View.VISIBLE);
+//    }
 
     public static void hideIcons(){
         findUserBtn.setVisibility(View.INVISIBLE);

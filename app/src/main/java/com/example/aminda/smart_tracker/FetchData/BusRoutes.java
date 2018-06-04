@@ -106,14 +106,17 @@ public class BusRoutes extends AsyncTask<String,Void,String []> {
                 int id = (int) jo.get("id");
                 Log.d("aaaaaaaaaa",routeNo+name+id);
             }
+
+            if(obj.length() > 0){
+                BusRouteFragment busRouteFragment = new BusRouteFragment();
+                busRouteFragment.setMain(main);
+                main.showFragment(busRouteFragment);
+            }else{
+                Toast.makeText(main, "Network Error!", Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        BusRouteFragment busRouteFragment = new BusRouteFragment();
-        busRouteFragment.setMain(main);
-        main.showFragment(busRouteFragment);
-
 
     }
 
