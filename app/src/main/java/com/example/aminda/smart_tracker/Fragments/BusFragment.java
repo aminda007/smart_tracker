@@ -59,15 +59,14 @@ public class BusFragment extends Fragment {
         routeList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d("5555555555555555555555", String.valueOf(adapterView.getItemAtPosition(i)));
-                if(checkActive(i)){
-                    main.setSelectedDriver(String.valueOf(adapterView.getItemAtPosition(i)));
-                    main.setSelectedDriverIndex(i);
-                    showBus();
-                }else{
-                    Toast.makeText(main, "Journey Stopped!", Toast.LENGTH_SHORT).show();
-                }
-
+            Log.d("5555555555555555555555", String.valueOf(adapterView.getItemAtPosition(i)));
+            if(checkActive(i)){
+                main.setSelectedDriver(String.valueOf(adapterView.getItemAtPosition(i)));
+                main.setSelectedDriverIndex(i);
+                showBus();
+            }else{
+                Toast.makeText(main, "Not Connected!", Toast.LENGTH_SHORT).show();
+            }
             }
         });
         return view;
@@ -76,7 +75,7 @@ public class BusFragment extends Fragment {
     private void showBus() {
         main.subscribeToDriver();
         main.showMapFragment();
-        main.showFindIcons();
+//        main.showFindIcons();
     }
 
     private boolean checkActive(int i){

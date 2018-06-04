@@ -99,8 +99,8 @@ public class BusTimeTable extends Fragment {
         Log.d(TAG, timeLow);
         Log.d(TAG, timeHigh);
         BusList br = new BusList(main);
-        main.setBusTimeLow(timeLow);
-        main.setBusTimeHigh(timeHigh);
+//        main.setBusTimeLow(timeLow);
+//        main.setBusTimeHigh(timeHigh);
         Log.d(TAG, main.getSelectedBusRoute());
         br.execute(main.getSelectedBusRoute(), timeLow, timeHigh);
     }

@@ -79,6 +79,8 @@ public class MainActivity extends AppCompatActivity
     private int selectedDriverIndex;
     private String busTimeHigh;
     private String busTimeLow;
+    private NavigationView navigationView;
+    private String driverInfo;
 
     private static final String TAG = "MainActivity";
 
@@ -105,8 +107,9 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
         fm = getSupportFragmentManager();
         showMapFragment();
         setInHome(true);
@@ -129,7 +132,9 @@ public class MainActivity extends AppCompatActivity
         if(!sharedpreferences.getString(String.valueOf(R.string.USER_USERNAME),String.valueOf(R.string.notLogged)).equals(String.valueOf(R.string.notLogged))){
             username  = sharedpreferences.getString(String.valueOf(R.string.USER_USERNAME),String.valueOf(R.string.notLogged));
             setActive(true);
+            navigationView.getMenu().findItem(R.id.nav_logout).setTitle("Log Out");
             Log.d(TAG, "user logeed in");
+            startDriverClient();
         }else{
             Log.d(TAG, "user not logeed in");
         }
@@ -178,7 +183,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         hideMapFragment();
-        GMapFragment.hideIcons();
 //        setInHome(false);
         int id = item.getItemId();
 
@@ -224,10 +228,8 @@ public class MainActivity extends AppCompatActivity
                 Login login = new Login();
                 login.setMain(this);
                 showFragment(login);
-                item.setTitle("Log Out");
             }else{
                 LogOut();
-                item.setTitle("Log In");
             }
 
         }
@@ -241,6 +243,7 @@ public class MainActivity extends AppCompatActivity
     private void LogOut() {
         setActive(false);
         setStarted(false);
+        navigationView.getMenu().findItem(R.id.nav_logout).setTitle("Log In");
         setUsername("");
     }
 
@@ -270,7 +273,7 @@ public class MainActivity extends AppCompatActivity
                 Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
             }
         };
-
+        Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
         client = new MqttClientMy(this.getApplicationContext(), "device_" + getClient_name() ,callback);
     }
 
@@ -306,7 +309,11 @@ public class MainActivity extends AppCompatActivity
         JSONObject driver = null;
         try {
             driver = (JSONObject) busArray.get(getSelectedDriverIndex());
-            GMapFragment.updateDriverInfo((String)driver.get("busNo")+(String)driver.get("telNo")+(String)driver.get("ownerType")+(String)driver.get("busType"));
+            setDriverInfo("Plate No: "+(String)driver.get("busNo")+"\n"+
+                    "Owner: "+(String)driver.get("ownerType")+"\n"+
+                    "Bus Type: "+(String)driver.get("busType")+"\n"+
+                    "Telephone No: "+(String)driver.get("telNo"));
+            Log.d("666666666",(String)driver.get("busNo")+(String)driver.get("telNo")+(String)driver.get("ownerType")+(String)driver.get("busType"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -564,6 +571,7 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString(String.valueOf(R.string.USER_USERNAME), username);
         editor.commit();
+        navigationView.getMenu().findItem(R.id.nav_logout).setTitle("Log Out");
     }
 
     public String getClient_name() {
@@ -572,28 +580,11 @@ public class MainActivity extends AppCompatActivity
         return String.valueOf(i);
     }
 
-    public void showFindIcons() {
-        GMapFragment.showIcons();
+    public String getDriverInfo() {
+        return driverInfo;
     }
 
-    public void hideFindIcons() {
-        GMapFragment.hideIcons();
-    }
-
-
-    public void setBusTimeHigh(String s) {
-        this.busTimeHigh = s;
-    }
-
-    public void setBusTimeLow(String s) {
-        this.busTimeLow = s;
-    }
-
-    public String getBusTimeHigh() {
-        return busTimeHigh;
-    }
-
-    public String getBusTimeLow() {
-        return busTimeLow;
+    public void setDriverInfo(String driverInfo) {
+        this.driverInfo = driverInfo;
     }
 }
