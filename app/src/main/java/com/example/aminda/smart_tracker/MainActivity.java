@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity
     private String client_name = "yyyyy";
     private JSONArray busRoutesArray;
     private JSONArray busArray;
-    private JSONArray coordinateArray;
     private String selectedBusRoute;
     private String selectedDriver;
     private int selectedDriverIndex;
