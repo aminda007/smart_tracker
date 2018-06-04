@@ -49,7 +49,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Random;
-
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener{
 
@@ -81,6 +80,7 @@ public class MainActivity extends AppCompatActivity
     private String busTimeLow;
     private NavigationView navigationView;
     private String driverInfo;
+    private JSONArray coordinateArray;
 
     private static final String TAG = "MainActivity";
 
@@ -88,7 +88,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -102,6 +101,7 @@ public class MainActivity extends AppCompatActivity
 //        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity
         checkLocation();
 
         startClient();
+
 
 
         SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
@@ -275,6 +276,7 @@ public class MainActivity extends AppCompatActivity
         };
         Log.w("Mqtt", "deliveryComplete000000000000000000000000000000000000000");
         client = new MqttClientMy(this.getApplicationContext(), "device_" + getClient_name() ,callback);
+
     }
 
     public void startDriverClient(){
@@ -586,5 +588,13 @@ public class MainActivity extends AppCompatActivity
 
     public void setDriverInfo(String driverInfo) {
         this.driverInfo = driverInfo;
+    }
+
+    public JSONArray getCoordinateArray() {
+        return coordinateArray;
+    }
+
+    public void setCoordinateArray(JSONArray coordinateArray) {
+        this.coordinateArray = coordinateArray;
     }
 }
