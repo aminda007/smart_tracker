@@ -56,6 +56,14 @@ public class MqttClientMy {
 
     }
 
+    public void disconnect(){
+        try {
+            client.disconnect();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void subscribeToTopic(String topic){
 

@@ -1,6 +1,7 @@
 package com.example.aminda.smart_tracker.Fragments;
 
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.example.aminda.smart_tracker.MainActivity;
+import com.example.aminda.smart_tracker.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,8 +22,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-import com.example.aminda.smart_tracker.R;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -100,6 +106,9 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
 //        setDriverInfo(null);
         LatLng sri_lanka = new LatLng(7.241829, 80.7556483);
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sri_lanka));
+        if(!activity.isInHome()){
+            drawRoute();
+        }
     }
 
     public static void updateLocation(Location location){
@@ -169,4 +178,27 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
         findUserBtn.setVisibility(View.INVISIBLE);
         findDriverBtn.setVisibility(View.INVISIBLE);
     }
+
+    public void drawRoute(){
+        try {
+            ArrayList<LatLng> points = new ArrayList<>();
+            PolylineOptions lineOptions = new PolylineOptions();
+            for (int j = 0; j < activity.getCoordinateArray().length(); j++) {
+                JSONObject jo = (JSONObject) activity.getCoordinateArray().get(j);
+                LatLng position = new LatLng((Double) jo.get("lat"), (Double) jo.get("lng"));
+                points.add(position);
+            }
+            lineOptions.addAll(points);
+            lineOptions.width(2);
+            lineOptions.color(Color.BLUE);
+            gmap.addPolyline(lineOptions);
+
+
+        }
+        catch (JSONException e) {
+
+        }
+    }
+
+
 }
