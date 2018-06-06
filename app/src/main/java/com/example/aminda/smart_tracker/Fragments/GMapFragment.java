@@ -12,10 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.example.aminda.smart_tracker.Adapters.CustomInfoWindowAdapter;
 import com.example.aminda.smart_tracker.MainActivity;
 import com.example.aminda.smart_tracker.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -145,9 +147,11 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
 
     public static void updateDriverLocation(LatLng loc){
         if (driver_marker == null) {
+            gmap.setInfoWindowAdapter(new CustomInfoWindowAdapter(activity));
             driver_marker = gmap.addMarker(new MarkerOptions()
                     .position(loc)
-                    .title(activity.getDriverInfo())
+                    .title(activity.getSelectedDriver())
+                    .snippet(activity.getDriverInfo())
                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_marker_bus_blue_round)));
 //            marker.showInfoWindow();
         } else {
@@ -189,7 +193,7 @@ public class GMapFragment extends Fragment implements OnMapReadyCallback {
                 points.add(position);
             }
             lineOptions.addAll(points);
-            lineOptions.width(2);
+            lineOptions.width(8);
             lineOptions.color(Color.BLUE);
             gmap.addPolyline(lineOptions);
 

@@ -34,13 +34,22 @@ public class BusAdapter extends ArrayAdapter<String> {
         String item = getItem(position);
         TextView plateNo = (TextView) customView.findViewById(R.id.plateNo);
         TextView busType = (TextView) customView.findViewById(R.id.busType);
+        TextView fromText = (TextView) customView.findViewById(R.id.fromText);
+        TextView startTimeText = (TextView) customView.findViewById(R.id.startTimeText);
         ImageView busIcon = (ImageView) customView.findViewById(R.id.busIcon);
         JSONObject jo = null;
         try {
             jo = (JSONObject) buses.get(position);
             plateNo.setText((String) jo.get("busNo"));
             busType.setText((String) jo.get("busType"));
-            busIcon.setImageResource(R.drawable.ic_directions_bus);
+            fromText.setText((String) jo.get("from"));
+            startTimeText.setText((String) jo.get("startTime"));
+            if((boolean) jo.get("connected")){
+                busIcon.setImageResource(R.drawable.ic_directions_bus);
+            }else{
+                busIcon.setImageResource(R.drawable.ic_directions_bus_grey);
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
