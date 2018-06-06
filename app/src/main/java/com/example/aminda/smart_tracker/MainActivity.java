@@ -91,15 +91,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -134,10 +125,11 @@ public class MainActivity extends AppCompatActivity
             username  = sharedpreferences.getString(String.valueOf(R.string.USER_USERNAME),String.valueOf(R.string.notLogged));
             setActive(true);
             navigationView.getMenu().findItem(R.id.nav_logout).setTitle("Log Out");
-            Log.d(TAG, "user logeed in");
+            Log.d(TAG, "user logeed in"+username);
             startDriverClient();
         }else{
             Log.d(TAG, "user not logeed in");
+            navigationView.getMenu().findItem(R.id.nav_start).setVisible(false);
         }
     }
 
@@ -245,7 +237,10 @@ public class MainActivity extends AppCompatActivity
         setActive(false);
         setStarted(false);
         navigationView.getMenu().findItem(R.id.nav_logout).setTitle("Log In");
-        setUsername("");
+        navigationView.getMenu().findItem(R.id.nav_start).setTitle("Start");
+        navigationView.getMenu().findItem(R.id.nav_start).setVisible(false);
+        driver.disconnect();
+        clearUser();
     }
 
 
@@ -311,11 +306,14 @@ public class MainActivity extends AppCompatActivity
         JSONObject driver = null;
         try {
             driver = (JSONObject) busArray.get(getSelectedDriverIndex());
-            setDriverInfo("Plate No: "+(String)driver.get("busNo")+"\n"+
+            setDriverInfo(
                     "Owner: "+(String)driver.get("ownerType")+"\n"+
                     "Bus Type: "+(String)driver.get("busType")+"\n"+
+                    "From: "+driver.getString("from")+"\n"+
+                    "Start Time: "+ driver.getString("startTime")+"\n"+
                     "Telephone No: "+(String)driver.get("telNo"));
-            Log.d("666666666",(String)driver.get("busNo")+(String)driver.get("telNo")+(String)driver.get("ownerType")+(String)driver.get("busType"));
+
+//            Log.d("666666666",(String)driver.get("busNo")+(String)driver.get("telNo")+(String)driver.get("ownerType")+(String)driver.get("busType"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -572,8 +570,16 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putString(String.valueOf(R.string.USER_USERNAME), username);
-        editor.commit();
+        editor.apply();
+        navigationView.getMenu().findItem(R.id.nav_start).setVisible(true);
         navigationView.getMenu().findItem(R.id.nav_logout).setTitle("Log Out");
+    }
+
+    public void clearUser() {
+        SharedPreferences sharedpreferences = getSharedPreferences(String.valueOf(R.string.user_details), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.clear();
+        editor.apply();
     }
 
     public String getClient_name() {
